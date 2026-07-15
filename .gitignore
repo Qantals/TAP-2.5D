@@ -178,4 +178,4 @@ pyrightconfig.json
 
 # End of https://www.toptal.com/developers/gitignore/api/python
 
-my_scripts/
+my_scripts/output/
