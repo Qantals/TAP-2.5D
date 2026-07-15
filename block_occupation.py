@@ -3,14 +3,16 @@ def print_grid(grid):
 		print (i)
 	print
 
-def initialize_grid(mi):
+def initialize_grid(mi, guard_gap=1.0, granularity=1.0):
 	grid = [[0 for _ in range(mi+1)] for _ in range(mi+1)]
-	# boundary protection
+	# boundary protection + guard gap
+	guard_cells = int(guard_gap / granularity)
 	for i in range(mi+1):
-		grid[0][i] = 1
-		grid[mi][i] = 1
-		grid[i][0] = 1
-		grid[i][mi] = 1
+		for g in range(guard_cells + 1):
+			grid[g][i] = 1
+			grid[mi-g][i] = 1
+			grid[i][g] = 1
+			grid[i][mi-g] = 1
 	return grid
 
 # width and height here are parameters passed in. We consider it is including microbump overhead. The addition should be handled before this module.

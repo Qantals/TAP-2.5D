@@ -29,7 +29,7 @@ def init_place_random(intp_size, granularity, chiplet_count, width, height):
 
 def init_place_tight(intp_size, granularity, chiplet_count, width, height):
 	x, y, rotation = [0] * chiplet_count, [0] * chiplet_count, [0] * chiplet_count	
-	grid = block_occupation.initialize_grid(int(intp_size/granularity))
+	grid = block_occupation.initialize_grid(int(intp_size/granularity), 1.0, granularity)
 	# print_grid(grid)
 	# print (width)
 	# print (height)

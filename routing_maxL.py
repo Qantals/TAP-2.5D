@@ -63,11 +63,11 @@ def get_input(system):
 	# xc, yc are the offset of the pin clump to the center of chiplet
 	xc, yc, pmax = [[None for h in range(Nclump)] for i in range(Nchiplet)],[[None for h in range(Nclump)] for i in range(Nchiplet)],[[None for h in range(Nclump)] for i in range(Nchiplet)]
 	for i in range(Nchiplet):
-		xl[i], yl[i] = system.x[i] - system.width[i] / 2 - system.hubump[i], system.y[i] - system.height[i] / 2 - system.hubump[i]
-		xc[i][0], yc[i][0], pmax[i][0] = system.hubump[i] / 2, system.height[i] / 2 + system.hubump[i], int(system.hubump[i] / ubump_pitch) * int((system.height[i]+system.hubump[i]) / ubump_pitch)
-		xc[i][1], yc[i][1], pmax[i][1] = system.width[i] / 2 + system.hubump[i], system.hubump[i] * 1.5 + system.height[i], int(system.hubump[i] / ubump_pitch) * int((system.width[i] + system.hubump[i]) / ubump_pitch)
-		xc[i][2], yc[i][2], pmax[i][2] = system.width[i] + system.hubump[i] * 1.5, yc[i][0], pmax[i][0]
-		xc[i][3], yc[i][3], pmax[i][3] = xc[i][1], system.hubump[i] / 2, pmax[i][1]
+		xl[i], yl[i] = system.x[i] - system.width[i] / 2 - system.rout_hubump[i], system.y[i] - system.height[i] / 2 - system.rout_hubump[i]
+		xc[i][0], yc[i][0], pmax[i][0] = system.rout_hubump[i] / 2, system.height[i] / 2 + system.rout_hubump[i], int(system.rout_hubump[i] / ubump_pitch) * int((system.height[i]+system.rout_hubump[i]) / ubump_pitch)
+		xc[i][1], yc[i][1], pmax[i][1] = system.width[i] / 2 + system.rout_hubump[i], system.rout_hubump[i] * 1.5 + system.height[i], int(system.rout_hubump[i] / ubump_pitch) * int((system.width[i] + system.rout_hubump[i]) / ubump_pitch)
+		xc[i][2], yc[i][2], pmax[i][2] = system.width[i] + system.rout_hubump[i] * 1.5, yc[i][0], pmax[i][0]
+		xc[i][3], yc[i][3], pmax[i][3] = xc[i][1], system.rout_hubump[i] / 2, pmax[i][1]
 	R = deepcopy(system.connection_matrix)
 	return xl, xc, yl, yc, R, Nchiplet, Nclump, pmax, Hopmax
 

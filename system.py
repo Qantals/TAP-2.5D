@@ -8,10 +8,12 @@ class System_25D:
 		self.width = [None] * self.chiplet_count
 		self.height = [None] * self.chiplet_count
 		self.hubump = [None] * self.chiplet_count
+		self.rout_hubump = [None] * self.chiplet_count
 		self.power = [None] * self.chiplet_count
 		self.rotation = [None] * self.chiplet_count
 		self.x = [None] * self.chiplet_count
 		self.y = [None] * self.chiplet_count
+		self.guard_gap = 1.0
 
 	def set_path(self, path):
 		self.path = path
@@ -36,10 +38,12 @@ class System_25D:
 		self.width = [None] * self.chiplet_count
 		self.height = [None] * self.chiplet_count
 		self.hubump = [None] * self.chiplet_count
+		self.rout_hubump = [None] * self.chiplet_count
 		self.power = [None] * self.chiplet_count
 		self.x = [None] * self.chiplet_count
 		self.y = [None] * self.chiplet_count
 		self.ubump = 0
+		self.guard_gap = 1.0
 
 	def set_chiplet_size(self, width, height):
 		self.width = width
