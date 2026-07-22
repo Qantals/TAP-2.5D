@@ -143,14 +143,14 @@ def accept_probability(old_temp, new_temp, old_length, new_length, T, weight):
         raise ValueError("Invalid weight option!")
     if temp_min != temp_max and length_min != length_max:
         old_cost = a * (old_temp - temp_min) / (temp_max - temp_min) + b * (
-            old_length - length_max
+            old_length - length_min
         ) / (length_max - length_min)
         new_cost = a * (new_temp - temp_min) / (temp_max - temp_min) + b * (
-            new_length - length_max
+            new_length - length_min
         ) / (length_max - length_min)
     else:
-        old_cost = a * (old_temp - temp_min) + b * (old_length - length_max)
-        new_cost = a * (new_temp - temp_min) + b * (new_length - length_max)
+        old_cost = a * (old_temp - temp_min) + b * (old_length - length_min)
+        new_cost = a * (new_temp - temp_min) + b * (new_length - length_min)
     delta = -(new_cost - old_cost)
     if "up" in weight:
         delta = -delta
