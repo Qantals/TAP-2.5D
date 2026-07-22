@@ -301,6 +301,12 @@ def anneal():
     # jumping_ratio = T_min / alpha
     jumping_ratio = 0.9  # fixed to 10% chance to jump
 
+    # compute initial cost
+    _, cost_current, _ = accept_probability(
+        temp_current, temp_current, length_current, length_current, T, system.weight
+    )
+    cost_best = cost_current
+
     # write initial step timing to CSV
     with open(timing_path, "w") as f:
         f.write(
@@ -415,6 +421,7 @@ def anneal():
                 )
                 if bap >= 1:
                     # if temp_new < temp_best:
+                    cost_best = new_cost
                     temp_best = temp_new
                     length_best = length_new
                     system_best = deepcopy(system_new)
@@ -441,13 +448,14 @@ def anneal():
     os.system("rm " + system.path + "*.png")
     # os.system('gs -dBATCH -dNOPAUSE -q -sDEVICE=pdfwrite -sOutputFile='+system.path+'combine.pdf '+system.path + 'step_{1..'+str(step_best)+'}L4.pdf')
     os.system("rm " + system.path + "step_*.pdf")
-    return system_best, step_best, temp_best, length_best
+    return system_best, step_best, temp_best, length_best, cost_best
 
 
 if __name__ == "__main__":
-    solution, step_best, temp_best, length_best = anneal()
+    solution, step_best, temp_best, length_best, cost_best = anneal()
     print("final solution:")
     print(f"step_best = {step_best}")
+    print(f"cost_best = {cost_best}")
     print(f"temp_best = {temp_best}")
     print(f"length_best = {length_best}")
     print(f"x = {solution.x}")
@@ -458,6 +466,9 @@ if __name__ == "__main__":
         OUTPUT.write(
             "step_best = "
             + str(step_best)
+            + "\n"
+            + "cost_best = "
+            + str(cost_best)
             + "\n"
             + "temp_best = "
             + str(temp_best)
