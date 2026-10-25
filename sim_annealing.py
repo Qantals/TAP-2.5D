@@ -184,12 +184,49 @@ def update_minmax(temp, length):
         length_min = length
 
 
+def write_output(solution, step_best, temp_best, length_best, cost_best):
+    """Write the best placement found so far.
+
+    This used to happen only once, after the last temperature level, so a run
+    killed in between (HotSpot error, OOM, lost session, wall-clock limit) lost
+    the whole search even though the best placement was already known. It is now
+    called from `register_log`, i.e. for the initial placement and after every
+    temperature level, so `output.txt` is never more than one level stale.
+    """
+    with open(solution.path + "output.txt", "w") as OUTPUT:
+        OUTPUT.write("step_best = " + str(step_best) + "\n")
+        OUTPUT.write("cost_best = " + str(cost_best) + "\n")
+        OUTPUT.write("temp_best = " + str(temp_best) + "\n")
+        OUTPUT.write("length_best = " + str(length_best) + "\n")
+        OUTPUT.write("x = " + str(solution.x) + "\n" + "y = " + str(solution.y) + "\n")
+        OUTPUT.write(
+            "width = "
+            + str(solution.width)
+            + "\n"
+            + "height = "
+            + str(solution.height)
+            + "\n"
+        )
+        OUTPUT.write("seed = " + str(getattr(solution, "seed", None)) + "\n")
+        OUTPUT.write("updated = " + time.strftime("%Y-%m-%d %H:%M:%S") + "\n")
+
+
 def register_log(
-    system_best, step_best, temp_best, length_best, T, step, old_cost, new_cost
+    system_best,
+    step_best,
+    temp_best,
+    length_best,
+    T,
+    step,
+    old_cost,
+    new_cost,
+    cost_best=None,
 ):
+    write_output(system_best, step_best, temp_best, length_best, cost_best)
     with open(system_best.path + "log.txt", "a+") as LOG:
         LOG.write("*" * 15 + "\n")
         LOG.write(f"Weight: {system_best.weight}\n")
+        LOG.write("seed = " + str(getattr(system_best, "seed", None)) + "\n")
         LOG.write("T = " + str(T) + "\t step = " + str(step) + "\n")
         LOG.write("old_cost = " + str(old_cost) + "\n")
         LOG.write("new_cost = " + str(new_cost) + "\n")
@@ -237,11 +274,33 @@ def register_step(system, step, temp, length, T, old_cost, new_cost):
         )
 
 
+def seed_from_argv():
+    """The `-g seed=<int>` value, or None.
+
+    Read straight from the command line because the seed has to be applied
+    before `config.read_config()` runs: the B*-tree initial placement is drawn
+    inside it, and seeding later would leave the starting point unreproducible.
+    """
+    for option, value in config.parse_command():
+        if option == "-g" and value.startswith("seed="):
+            return int(value.split("=", 1)[1])
+    return None
+
+
 def anneal():
     # first step: read config and generate initial placement
     global temp_max, temp_min, length_max, length_min
     temp_max, temp_min, length_max, length_min = 0, 200, 0, 200
+    seed = seed_from_argv()
+    if seed is None:
+        print("Random seed: unset (this run is not reproducible)")
+    else:
+        random.seed(seed)
+        np.random.seed(seed)
+        print(f"Random seed: {seed}")
     system = config.read_config()
+    if seed is not None:
+        system.set_seed(seed)
     print(f"Weight: {system.weight}")
     system_new = deepcopy(system)
     system_best = deepcopy(system)
@@ -319,7 +378,15 @@ def anneal():
     # start simulated annealing
     old_cost, new_cost = 0, 0
     register_log(
-        system_best, step_best, temp_best, length_best, T, step, old_cost, new_cost
+        system_best,
+        step_best,
+        temp_best,
+        length_best,
+        T,
+        step,
+        old_cost,
+        new_cost,
+        cost_best,
     )
     register_step(system, step, temp_current, length_current, T, old_cost, new_cost)
     while T > T_min:
@@ -432,7 +499,15 @@ def anneal():
                 print("AP = ", ap, " < ", r, " Reject!")
             i += 1
         register_log(
-            system_best, step_best, temp_best, length_best, T, step, old_cost, new_cost
+            system_best,
+            step_best,
+            temp_best,
+            length_best,
+            T,
+            step,
+            old_cost,
+            new_cost,
+            cost_best,
         )
         T *= alpha
         # jumping_ratio /= alpha
@@ -462,27 +537,4 @@ if __name__ == "__main__":
     print(f"y = {solution.y}")
     print(f"width = {solution.width}")
     print(f"height = {solution.height}")
-    with open(solution.path + "output.txt", "w") as OUTPUT:
-        OUTPUT.write(
-            "step_best = "
-            + str(step_best)
-            + "\n"
-            + "cost_best = "
-            + str(cost_best)
-            + "\n"
-            + "temp_best = "
-            + str(temp_best)
-            + "\n"
-            + "length_best = "
-            + str(length_best)
-            + "\n"
-        )
-        OUTPUT.write("x = " + str(solution.x) + "\n" + "y = " + str(solution.y) + "\n")
-        OUTPUT.write(
-            "width = "
-            + str(solution.width)
-            + "\n"
-            + "height = "
-            + str(solution.height)
-            + "\n"
-        )
+    write_output(solution, step_best, temp_best, length_best, cost_best)

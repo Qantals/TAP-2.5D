@@ -14,9 +14,15 @@ class System_25D:
         self.x = [None] * self.chiplet_count
         self.y = [None] * self.chiplet_count
         self.guard_gap = 1.0
+        # None means "no seeding": each run then draws its own trajectory and is
+        # not reproducible, which is what `-g seed=<int>` exists to avoid.
+        self.seed = None
 
     def set_path(self, path):
         self.path = path
+
+    def set_seed(self, seed):
+        self.seed = seed
 
     def set_decay_factor(self, decay):
         self.decay = decay

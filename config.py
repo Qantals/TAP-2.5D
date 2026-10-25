@@ -26,7 +26,7 @@ def read_config():
     interposer_size = 0
     link_type = None
     x, y = None, None
-    decay, weight = None, None
+    decay, weight, seed = None, None, None
     for o, a in opts:
         if o == '-h':
             usage()
@@ -51,6 +51,8 @@ def read_config():
             decay = float(a)
         if o == 'weight':
             weight = a
+        if o == 'seed':
+            seed = int(a)
 
     config = configparser.ConfigParser()
     config.read(filename)
@@ -113,6 +115,8 @@ def read_config():
             os.system('mkdir -p ' + path)
         system.set_decay_factor(decay)
         system.set_weight_option(weight)
+        if seed is not None:
+            system.set_seed(seed)
         system.set_chiplet_count(chiplet_count)
         system.initialize()
         system.set_interposer_type(interposer_type)
